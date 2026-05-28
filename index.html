@@ -49,7 +49,6 @@
   .center { text-align: center; padding: 80px 24px; color: #c4cad6; }
 
   /* ── TOPBAR ── */
-  .coach-info { font-family: 'Oswald', sans-serif; font-size: 13px; color: #c4cad6; display: flex; align-items: center; gap: 12px; }
   .btn-logout { background: transparent; border: 1px solid #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .15s; }
   .btn-logout:hover { border-color: #c8252c; color: #c8252c; }
   .btn-back { background: transparent; border: 1px solid #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .15s; }
@@ -152,7 +151,7 @@ const SAVE_DEBOUNCE_MS = 500;
 // ── State ──
 let state = {
   view: 'login',
-  coach: null,           // { firstName, lastName }
+  authenticated: false,
   members: [],           // [{ firstName, lastName, email, routinePlan: { shareToken, updatedAt } | null }]
   editingMember: null,
   currentData: null,     // JSONB mutable
@@ -254,11 +253,8 @@ function updateTopbar() {
     ? `<button class="btn-back" onclick="navigate('dashboard')">← Socios</button>`
     : '';
 
-  right.innerHTML = state.coach
-    ? `<div class="coach-info">
-         <span style="white-space:nowrap">${esc(state.coach.firstName)} ${esc(state.coach.lastName)}</span>
-         <button class="btn-logout" onclick="logout()">Salir</button>
-       </div>`
+  right.innerHTML = state.authenticated
+    ? `<button class="btn-logout" onclick="logout()">Salir</button>`
     : '';
 }
 
@@ -271,7 +267,7 @@ function navigate(view) {
 
 function logout() {
   sessionStorage.removeItem('coach');
-  state = { view: 'login', coach: null, members: [], editingMember: null, currentData: null, currentShareToken: null };
+  state = { view: 'login', authenticated: false, members: [], editingMember: null, currentData: null, currentShareToken: null };
   updateTopbar();
   render();
 }
@@ -295,10 +291,6 @@ function renderLogin() {
         <div class="label">━━ ACCESO PROFESORES</div>
         <div style="display:flex;flex-direction:column;gap:16px;margin-top:24px">
           <div>
-            <label class="field-label" for="login-name">Tu nombre</label>
-            <input type="text" id="login-name" class="text-input" placeholder="Ej: Luisa" autocomplete="off" />
-          </div>
-          <div>
             <label class="field-label" for="login-pass">Contraseña</label>
             <input type="password" id="login-pass" class="pin-input" placeholder="••••••••" autocomplete="current-password" style="letter-spacing:4px;font-size:22px" />
             <p id="login-error" class="field-error" style="display:none"></p>
@@ -308,29 +300,21 @@ function renderLogin() {
       </div>
     </div>`;
 
-  const nameEl = document.getElementById('login-name');
   const passEl = document.getElementById('login-pass');
   const btn    = document.getElementById('login-btn');
   const errEl  = document.getElementById('login-error');
 
   async function doLogin() {
     errEl.style.display = 'none';
-    const name = nameEl.value.trim();
-    const pass = passEl.value;
-    if (!name) {
-      errEl.textContent = 'Ingresá tu nombre';
-      errEl.style.display = 'block';
-      return;
-    }
-    if (pass !== APP_PASSWORD) {
+    if (passEl.value !== APP_PASSWORD) {
       errEl.textContent = 'Contraseña incorrecta';
       errEl.style.display = 'block';
       passEl.value = '';
       passEl.focus();
       return;
     }
-    state.coach = { firstName: name, lastName: '' };
-    sessionStorage.setItem('coach', JSON.stringify(state.coach));
+    state.authenticated = true;
+    sessionStorage.setItem('coach', '1');
     root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
     await loadMembers();
     navigate('dashboard');
@@ -338,7 +322,6 @@ function renderLogin() {
 
   btn.addEventListener('click', doLogin);
   passEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
-  nameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') passEl.focus(); });
 }
 
 // ═══════════════════════════════════════
@@ -675,16 +658,13 @@ function bindEditorEvents() {
 // BOOT
 // ═══════════════════════════════════════
 async function boot() {
-  const saved = sessionStorage.getItem('coach');
-  if (saved) {
-    try {
-      state.coach = JSON.parse(saved);
-      root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
-      updateTopbar();
-      await loadMembers();
-      navigate('dashboard');
-      return;
-    } catch { sessionStorage.removeItem('coach'); }
+  if (sessionStorage.getItem('coach') === '1') {
+    state.authenticated = true;
+    root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
+    updateTopbar();
+    await loadMembers();
+    navigate('dashboard');
+    return;
   }
   navigate('login');
 }
