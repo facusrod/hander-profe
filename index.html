@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hander — Profesores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── BASE (copiado de hander-rutinas) ── */
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: #162033; background-image: radial-gradient(circle at 20% 0%, #1f2d4740 0%, transparent 50%); color: #fff; font-family: 'Inter', sans-serif; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .topbar { background: #0d1422; border-bottom: 2px solid #c8252c; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; min-height: 68px; }
+  .topbar-brand { display: flex; flex-direction: column; align-items: center; }
+  .logo-h { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; letter-spacing: 2px; -webkit-text-stroke: 2px #c8252c; paint-order: stroke fill; text-shadow: 0 3px 0 #9c1a20; line-height: 1; }
+  .logo-sub { font-family: 'Oswald', sans-serif; font-size: 9px; color: #fff; letter-spacing: 2px; margin-top: 2px; text-align: center; }
+  .label { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 3px; color: #c8252c; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .h2 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: #fff; margin: 0; letter-spacing: 1.5px; }
+  .header-card { background: linear-gradient(135deg, #0d1422 0%, #162033 100%); border: 1px solid #1f2d47; border-top: 6px solid #c8252c; padding: 40px 32px; border-radius: 4px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .header-card::after { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, #c8252c22 0%, transparent 70%); pointer-events: none; }
+  .block-num { width: 48px; height: 48px; background: #c8252c; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 28px; border-radius: 4px; flex-shrink: 0; }
+  .progressions { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #1f2d47; align-items: end; }
+  .week { text-align: center; }
+  .week-label { font-family: 'Oswald', sans-serif; font-size: 9px; letter-spacing: 1.5px; color: #8a93a6; text-transform: uppercase; }
+  .week-vals { display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; margin-top: 6px; }
+  .week-x { font-family: 'Inter', sans-serif; font-size: 11px; color: #8a93a6; }
+  .reps-input { background: #0d1422; border: 1px solid #1f2d47; color: #c8252c; font-family: 'Bebas Neue', sans-serif; font-size: 20px; text-align: center; padding: 4px 2px; border-radius: 3px; outline: none; width: 100%; max-width: 60px; }
+  .reps-input:focus { border-color: #c8252c; }
+  .weight-input { display: inline-flex; flex-direction: column; align-items: stretch; gap: 3px; width: 60px; }
+  .w-btn { width: 100%; height: 22px; background: #1f2d47; border: 1px solid #1f2d47; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; border-radius: 3px; padding: 0; line-height: 1; transition: all .15s; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .w-btn:hover { background: #c8252c; border-color: #c8252c; }
+  .w-btn:active { transform: scale(.92); }
+  .w-val { width: 100%; background: #0d1422; border: 1px solid #1f2d47; color: #c8252c; font-family: 'Bebas Neue', sans-serif; font-size: 20px; text-align: center; padding: 4px 2px; border-radius: 3px; outline: none; -moz-appearance: textfield; }
+  .w-val::-webkit-inner-spin-button, .w-val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .w-val:focus { border-color: #c8252c; }
+  .series-row { font-family: 'Oswald', sans-serif; font-size: 11px; color: #c4cad6; margin-top: 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; letter-spacing: 1px; text-transform: uppercase; }
+  .series-input { background: #0d1422; border: 1px solid #1f2d47; color: #c4cad6; font-family: 'Bebas Neue', sans-serif; font-size: 16px; text-align: center; padding: 2px 4px; border-radius: 3px; outline: none; width: 42px; -moz-appearance: textfield; }
+  .series-input::-webkit-inner-spin-button, .series-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .series-input:focus { border-color: #c8252c; }
+  .save-status { position: fixed; top: 12px; right: 12px; padding: 6px 12px; border-radius: 4px; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; transition: opacity .25s, transform .2s; z-index: 1000; pointer-events: none; opacity: 0; transform: translateY(-6px); box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  .save-status.visible { opacity: 1; transform: translateY(0); }
+  .save-saving { background: #1f2d47; color: #c4cad6; }
+  .save-saved  { background: #16a34a; color: #fff; }
+  .save-error  { background: #c8252c; color: #fff; }
+  .spin { display: inline-block; width: 24px; height: 24px; border: 3px solid #1f2d47; border-top-color: #c8252c; border-radius: 50%; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .center { text-align: center; padding: 80px 24px; color: #c4cad6; }
+
+  /* ── TOPBAR ── */
+  .coach-info { font-family: 'Oswald', sans-serif; font-size: 13px; color: #c4cad6; display: flex; align-items: center; gap: 12px; }
+  .btn-logout { background: transparent; border: 1px solid #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .15s; }
+  .btn-logout:hover { border-color: #c8252c; color: #c8252c; }
+  .btn-back { background: transparent; border: 1px solid #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .15s; }
+  .btn-back:hover { border-color: #c8252c; color: #c8252c; }
+
+  /* ── LOGIN ── */
+  .login-card { max-width: 440px; margin: 60px auto 0; }
+  .field-label { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 2px; color: #8a93a6; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .text-input { background: #0d1422; border: 1px solid #1f2d47; color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; padding: 10px 12px; border-radius: 3px; outline: none; width: 100%; }
+  .text-input:focus { border-color: #c8252c; }
+  .text-input::placeholder { color: #8a93a6; }
+  .pin-input { background: #0d1422; border: 1px solid #1f2d47; color: #c8252c; font-family: 'Bebas Neue', sans-serif; font-size: 28px; text-align: center; letter-spacing: 8px; padding: 10px 12px; border-radius: 3px; outline: none; width: 100%; }
+  .pin-input:focus { border-color: #c8252c; }
+  .btn-primary { width: 100%; background: #c8252c; border: none; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; padding: 12px; border-radius: 3px; cursor: pointer; transition: all .15s; margin-top: 8px; }
+  .btn-primary:hover { background: #a81e22; }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .field-error { font-family: 'Inter', sans-serif; font-size: 12px; color: #e63946; margin: 6px 0 0; }
+
+  /* ── DASHBOARD ── */
+  .search-wrap { position: relative; margin-bottom: 16px; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #8a93a6; font-size: 14px; pointer-events: none; }
+  .search-input { background: #0d1422; border: 1px solid #1f2d47; color: #fff; font-family: 'Inter', sans-serif; font-size: 15px; padding: 10px 12px 10px 36px; border-radius: 3px; outline: none; width: 100%; }
+  .search-input:focus { border-color: #c8252c; }
+  .search-input::placeholder { color: #8a93a6; }
+  .member-row { background: #0d1422; border: 1px solid #1f2d47; border-left: 4px solid #1f2d47; padding: 14px 18px; border-radius: 3px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all .15s; }
+  .member-row:hover { border-color: #c8252c; border-left-color: #c8252c; background: #c8252c0a; }
+  .member-name { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; color: #fff; flex: 1; }
+  .routine-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .has-plan { background: #16a34a; box-shadow: 0 0 6px #16a34a80; }
+  .no-plan { background: #1f2d47; }
+  .routine-badge { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #8a93a6; }
+  .routine-badge.ok { color: #16a34a; }
+  .no-results { text-align: center; padding: 40px; font-family: 'Oswald', sans-serif; color: #8a93a6; letter-spacing: 1px; }
+
+  /* ── EDITOR ── */
+  .member-label { font-family: 'Oswald', sans-serif; font-size: 14px; color: #c4cad6; margin-bottom: 12px; }
+  .text-input-big { background: transparent; border: none; border-bottom: 2px solid #1f2d47; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; padding: 4px 0; outline: none; width: 100%; }
+  .text-input-big:focus { border-bottom-color: #c8252c; }
+  .text-input-big::placeholder { color: #1f2d4780; }
+  .text-input-sub { background: transparent; border: none; border-bottom: 1px solid #1f2d47; color: #c4cad6; font-family: 'Inter', sans-serif; font-size: 14px; padding: 4px 0; outline: none; width: 100%; margin-top: 12px; }
+  .text-input-sub:focus { border-bottom-color: #c8252c; }
+  .text-input-sub::placeholder { color: #1f2d47; }
+  .block-card { background: #0d1422; border: 1px solid #1f2d47; border-radius: 4px; padding: 20px; margin-bottom: 20px; }
+  .block-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .block-name-input { background: transparent; border: none; border-bottom: 1px solid #1f2d47; color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 2px 0; outline: none; flex: 1; min-width: 100px; }
+  .block-name-input:focus { border-bottom-color: #c8252c; }
+  .block-series-wrap { display: flex; align-items: center; gap: 6px; font-family: 'Oswald', sans-serif; font-size: 11px; color: #8a93a6; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .block-series-input { background: #162033; border: 1px solid #1f2d47; color: #c4cad6; font-family: 'Bebas Neue', sans-serif; font-size: 18px; text-align: center; padding: 2px 4px; border-radius: 3px; outline: none; width: 42px; -moz-appearance: textfield; }
+  .block-series-input::-webkit-inner-spin-button, .block-series-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .block-series-input:focus { border-color: #c8252c; }
+  .btn-icon { background: transparent; border: 1px solid #1f2d47; color: #8a93a6; font-size: 13px; padding: 4px 7px; border-radius: 3px; cursor: pointer; transition: all .15s; line-height: 1; }
+  .btn-icon:hover { border-color: #c8252c; color: #c8252c; }
+  .btn-icon:disabled { opacity: .25; cursor: default; pointer-events: none; }
+  .ex-card-editor { background: #162033; border: 1px solid #1f2d47; border-left: 4px solid #1f2d47; padding: 14px 16px; border-radius: 3px; margin-bottom: 8px; }
+  .ex-card-editor:focus-within { border-left-color: #c8252c; }
+  .ex-top { display: flex; align-items: center; gap: 8px; }
+  .ex-num-label { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #8a93a6; width: 28px; text-align: center; flex-shrink: 0; }
+  .ex-name-input { background: transparent; border: none; border-bottom: 1px solid #1f2d47; color: #fff; font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; padding: 2px 0; outline: none; flex: 1; }
+  .ex-name-input:focus { border-bottom-color: #c8252c; }
+  .ex-name-input::placeholder { color: #8a93a6; }
+  .notes-input { background: transparent; border: none; border-bottom: 1px solid #1f2d4750; color: #8a93a6; font-family: 'Inter', sans-serif; font-size: 12px; padding: 4px 0; outline: none; width: 100%; margin-top: 8px; }
+  .notes-input:focus { border-bottom-color: #c8252c; color: #c4cad6; }
+  .notes-input::placeholder { color: #8a93a660; font-style: italic; }
+  .prog-del-btn { background: transparent; border: none; color: #8a93a640; font-size: 13px; cursor: pointer; padding: 2px; transition: color .15s; display: block; margin: 4px auto 0; }
+  .prog-del-btn:hover { color: #c8252c; }
+  .add-btn { width: 100%; background: transparent; border: 1px dashed #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; padding: 10px; border-radius: 3px; cursor: pointer; transition: all .15s; }
+  .add-btn:hover { border-color: #c8252c; color: #c8252c; }
+  .add-week-btn { background: transparent; border: 1px dashed #1f2d47; color: #8a93a6; font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 4px; border-radius: 3px; cursor: pointer; transition: all .15s; width: 60px; }
+  .add-week-btn:hover { border-color: #c8252c; color: #c8252c; }
+
+  @media (max-width: 600px) {
+    .header-card { padding: 24px 20px; }
+    .login-card { margin-top: 24px; }
+    .topbar { padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div id="topbar-left" style="min-width:80px"></div>
+  <div class="topbar-brand">
+    <div class="logo-h">HANDER</div>
+    <div class="logo-sub">CENTRO DE ENTRENAMIENTO</div>
+  </div>
+  <div id="topbar-right" style="min-width:80px;display:flex;justify-content:flex-end"></div>
+</div>
+
+<div id="save-status" class="save-status"></div>
+<div id="root"></div>
+
+<script>
+// ── Config ──
+const API_BASE         = 'https://hander.gym-pass.com.ar/api/public';
+const API_KEY          = 'hk_1OSGVDJq03IWgiuukDuxTqIhpbx3ueAjMdIbyUDtejg';
+const APP_PASSWORD     = 'hander2026'; // cambiar para actualizar la contraseña de acceso
+const SAVE_DEBOUNCE_MS = 500;
+
+// ── State ──
+let state = {
+  view: 'login',
+  coach: null,           // { firstName, lastName }
+  members: [],           // [{ firstName, lastName, email, routinePlan: { shareToken, updatedAt } | null }]
+  editingMember: null,
+  currentData: null,     // JSONB mutable
+  currentShareToken: null,
+};
+
+// ── Filtered members (para no re-filtrar en openMember) ──
+let _filteredMembers = [];
+
+// ── Save ──
+let saveTimer = null, saveInFlight = false, savePending = false;
+let saveStatusEl = null, saveStatusTimer = null;
+
+function setSaveStatus(s) {
+  if (!saveStatusEl) saveStatusEl = document.getElementById('save-status');
+  if (!saveStatusEl) return;
+  if (saveStatusTimer) { clearTimeout(saveStatusTimer); saveStatusTimer = null; }
+  saveStatusEl.className = 'save-status visible save-' + s;
+  saveStatusEl.textContent = s === 'saving' ? 'Guardando...' : s === 'saved' ? '✓ Guardado' : '⚠ Error al guardar';
+  if (s !== 'saving') {
+    saveStatusTimer = setTimeout(() => { saveStatusEl.className = 'save-status'; }, 1800);
+  }
+}
+
+function triggerSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
+}
+
+async function doSave() {
+  if (!state.currentData) return;
+  if (saveInFlight) { savePending = true; return; }
+  saveInFlight = true;
+  setSaveStatus('saving');
+  try {
+    if (state.currentShareToken) {
+      const res = await fetch(`${API_BASE}/routines/${encodeURIComponent(state.currentShareToken)}`, {
+        method: 'PUT',
+        headers: { 'X-Api-Key': API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: state.currentData }),
+      });
+      setSaveStatus(res.ok ? 'saved' : 'error');
+    } else {
+      // Primer guardado del plan: crear via sync (match por email del socio)
+      if (!state.editingMember?.email) { setSaveStatus('error'); return; }
+      const res = await fetch(`${API_BASE}/routines/sync`, {
+        method: 'POST',
+        headers: { 'X-Api-Key': API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          routines: [{
+            match: { email: state.editingMember.email },
+            data: state.currentData,
+            sourceSheet: 'hander-profe',
+          }],
+        }),
+      });
+      if (!res.ok) { setSaveStatus('error'); return; }
+      const json = await res.json();
+      const matched = json.matched?.[0];
+      if (matched?.shareToken) {
+        state.currentShareToken = matched.shareToken;
+        setSaveStatus('saved');
+      } else {
+        setSaveStatus('error');
+      }
+    }
+  } catch { setSaveStatus('error'); }
+  finally {
+    saveInFlight = false;
+    if (savePending) { savePending = false; triggerSave(); }
+  }
+}
+
+// ── Helpers ──
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function newPlanTemplate() {
+  return {
+    version: 1, name: '', subtitle: '',
+    blocks: [{
+      block_number: 1, name: 'Bloque 1', series: 3,
+      exercises: [{
+        position: 1, name: '', notes: '',
+        progressions: [{ week: 1, kg: null, reps: '', series: 3 }],
+      }],
+    }],
+  };
+}
+
+// ── Topbar ──
+function updateTopbar() {
+  const left  = document.getElementById('topbar-left');
+  const right = document.getElementById('topbar-right');
+  if (!left || !right) return;
+
+  left.innerHTML  = (state.view === 'editor')
+    ? `<button class="btn-back" onclick="navigate('dashboard')">← Socios</button>`
+    : '';
+
+  right.innerHTML = state.coach
+    ? `<div class="coach-info">
+         <span style="white-space:nowrap">${esc(state.coach.firstName)} ${esc(state.coach.lastName)}</span>
+         <button class="btn-logout" onclick="logout()">Salir</button>
+       </div>`
+    : '';
+}
+
+// ── Navigation ──
+function navigate(view) {
+  state.view = view;
+  updateTopbar();
+  render();
+}
+
+function logout() {
+  sessionStorage.removeItem('coach');
+  state = { view: 'login', coach: null, members: [], editingMember: null, currentData: null, currentShareToken: null };
+  updateTopbar();
+  render();
+}
+
+// ── Main render ──
+const root = document.getElementById('root');
+
+function render() {
+  if (state.view === 'login')     renderLogin();
+  else if (state.view === 'dashboard') renderDashboard();
+  else if (state.view === 'editor')    renderEditor();
+}
+
+// ═══════════════════════════════════════
+// VISTA: LOGIN
+// ═══════════════════════════════════════
+function renderLogin() {
+  root.innerHTML = `
+    <div class="wrap">
+      <div class="header-card login-card">
+        <div class="label">━━ ACCESO PROFESORES</div>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:24px">
+          <div>
+            <label class="field-label" for="login-name">Tu nombre</label>
+            <input type="text" id="login-name" class="text-input" placeholder="Ej: Luisa" autocomplete="off" />
+          </div>
+          <div>
+            <label class="field-label" for="login-pass">Contraseña</label>
+            <input type="password" id="login-pass" class="pin-input" placeholder="••••••••" autocomplete="current-password" style="letter-spacing:4px;font-size:22px" />
+            <p id="login-error" class="field-error" style="display:none"></p>
+          </div>
+          <button id="login-btn" class="btn-primary">INGRESAR</button>
+        </div>
+      </div>
+    </div>`;
+
+  const nameEl = document.getElementById('login-name');
+  const passEl = document.getElementById('login-pass');
+  const btn    = document.getElementById('login-btn');
+  const errEl  = document.getElementById('login-error');
+
+  async function doLogin() {
+    errEl.style.display = 'none';
+    const name = nameEl.value.trim();
+    const pass = passEl.value;
+    if (!name) {
+      errEl.textContent = 'Ingresá tu nombre';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (pass !== APP_PASSWORD) {
+      errEl.textContent = 'Contraseña incorrecta';
+      errEl.style.display = 'block';
+      passEl.value = '';
+      passEl.focus();
+      return;
+    }
+    state.coach = { firstName: name, lastName: '' };
+    sessionStorage.setItem('coach', JSON.stringify(state.coach));
+    root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
+    await loadMembers();
+    navigate('dashboard');
+  }
+
+  btn.addEventListener('click', doLogin);
+  passEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+  nameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') passEl.focus(); });
+}
+
+// ═══════════════════════════════════════
+// VISTA: DASHBOARD
+// ═══════════════════════════════════════
+async function loadMembers() {
+  try {
+    const res = await fetch(`${API_BASE}/members`, { headers: { 'X-Api-Key': API_KEY } });
+    if (res.ok) state.members = await res.json();
+  } catch { /* silent */ }
+}
+
+function renderDashboard() {
+  root.innerHTML = `
+    <div class="wrap">
+      <div style="margin-bottom:20px">
+        <div class="label">━━ SOCIOS</div>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="search" id="search-input" class="search-input" placeholder="Buscar por nombre..." />
+        </div>
+      </div>
+      <div id="member-list"></div>
+    </div>`;
+
+  const searchEl = document.getElementById('search-input');
+  searchEl.addEventListener('input', () => renderMemberList(searchEl.value));
+  renderMemberList('');
+}
+
+function renderMemberList(query) {
+  const listEl = document.getElementById('member-list');
+  if (!listEl) return;
+
+  const q = query.toLowerCase().trim();
+  _filteredMembers = state.members
+    .map((m, originalIdx) => ({ m, originalIdx }))
+    .filter(({ m }) => !q || `${m.firstName} ${m.lastName}`.toLowerCase().includes(q));
+
+  if (!state.members.length) {
+    listEl.innerHTML = `<div class="no-results" style="font-family:'Oswald',sans-serif;letter-spacing:1px">Sin socios registrados</div>`;
+    return;
+  }
+  if (!_filteredMembers.length) {
+    listEl.innerHTML = `<div class="no-results" style="font-family:'Oswald',sans-serif;letter-spacing:1px">Sin resultados para "${esc(q)}"</div>`;
+    return;
+  }
+
+  listEl.innerHTML = _filteredMembers.map(({ m, originalIdx }, fi) => {
+    const hasPlan = !!m.routinePlan;
+    return `
+      <div class="member-row" data-fi="${fi}" onclick="openMember(${fi})">
+        <div class="routine-dot ${hasPlan ? 'has-plan' : 'no-plan'}"></div>
+        <div class="member-name">${esc(m.firstName)} ${esc(m.lastName)}</div>
+        <span class="routine-badge ${hasPlan ? 'ok' : ''}">${hasPlan ? 'Con rutina' : 'Sin rutina'}</span>
+        <span style="color:#8a93a6;font-size:18px;margin-left:4px">›</span>
+      </div>`;
+  }).join('');
+}
+
+function openMember(fi) {
+  const entry = _filteredMembers[fi];
+  if (!entry) return;
+  const member = entry.m;
+
+  state.editingMember   = member;
+  state.currentShareToken = member.routinePlan?.shareToken || null;
+  state.currentData       = null;
+
+  if (state.currentShareToken) {
+    loadAndOpenEditor(state.currentShareToken);
+  } else {
+    state.currentData = newPlanTemplate();
+    navigate('editor');
+  }
+}
+
+async function loadAndOpenEditor(shareToken) {
+  root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
+  try {
+    const res = await fetch(`${API_BASE}/routines/${encodeURIComponent(shareToken)}`, {
+      headers: { 'X-Api-Key': API_KEY },
+    });
+    if (!res.ok) { navigate('dashboard'); return; }
+    const payload = await res.json();
+    state.currentData = payload.data;
+    navigate('editor');
+  } catch { navigate('dashboard'); }
+}
+
+// ═══════════════════════════════════════
+// VISTA: EDITOR
+// ═══════════════════════════════════════
+function renderEditor() {
+  const member = state.editingMember;
+  const data   = state.currentData;
+
+  root.innerHTML = `
+    <div class="wrap">
+      <div class="header-card">
+        <div class="member-label">Rutina de <strong>${esc(member ? `${member.firstName} ${member.lastName}` : '')}</strong></div>
+        <input type="text" class="text-input-big" id="plan-name" placeholder="NOMBRE DEL PLAN" value="${esc(data.name || '')}" />
+        <input type="text" class="text-input-sub" id="plan-subtitle" placeholder="Descripción..." value="${esc(data.subtitle || '')}" />
+      </div>
+
+      <div id="blocks-container">
+        ${(data.blocks || []).map((b, bi) => renderBlockHtml(b, bi)).join('')}
+      </div>
+
+      <button class="add-btn" id="add-block-btn" style="margin-bottom:60px">+ AGREGAR BLOQUE</button>
+    </div>`;
+
+  bindEditorEvents();
+}
+
+function renderBlockHtml(b, bi) {
+  const exs = b.exercises || [];
+  return `
+    <div class="block-card">
+      <div class="block-card-head">
+        <div class="block-num">${bi + 1}</div>
+        <input type="text" class="block-name-input" data-bi="${bi}" placeholder="Nombre del bloque" value="${esc(b.name || '')}" />
+        <div class="block-series-wrap">
+          <input type="number" class="block-series-input" data-bi="${bi}" min="0" value="${b.series || 3}" />
+          <span>series def.</span>
+        </div>
+        <button class="btn-icon" data-action="del-block" data-bi="${bi}" title="Eliminar bloque">✕</button>
+      </div>
+      <div>
+        ${exs.map((ex, ei) => renderExerciseHtml(ex, bi, ei, exs.length)).join('')}
+      </div>
+      <button class="add-btn" data-action="add-ex" data-bi="${bi}" style="margin-top:8px">+ AGREGAR EJERCICIO</button>
+    </div>`;
+}
+
+function renderExerciseHtml(ex, bi, ei, totalEx) {
+  const progs = ex.progressions || [];
+  return `
+    <div class="ex-card-editor">
+      <div class="ex-top">
+        <span class="ex-num-label">${String(ei + 1).padStart(2, '0')}</span>
+        <input type="text" class="ex-name-input" data-bi="${bi}" data-ei="${ei}" placeholder="Nombre del ejercicio" value="${esc(ex.name || '')}" />
+        <button class="btn-icon" data-action="move-up" data-bi="${bi}" data-ei="${ei}" title="Subir" ${ei === 0 ? 'disabled' : ''}>↑</button>
+        <button class="btn-icon" data-action="move-down" data-bi="${bi}" data-ei="${ei}" title="Bajar" ${ei === totalEx - 1 ? 'disabled' : ''}>↓</button>
+        <button class="btn-icon" data-action="del-ex" data-bi="${bi}" data-ei="${ei}" title="Eliminar ejercicio">✕</button>
+      </div>
+      <input type="text" class="notes-input" data-bi="${bi}" data-ei="${ei}" placeholder="Notas del ejercicio..." value="${esc(ex.notes || '')}" />
+      <div class="progressions">
+        ${progs.map((p, pi) => renderProgressionHtml(p, bi, ei, pi)).join('')}
+        <button class="add-week-btn" data-action="add-week" data-bi="${bi}" data-ei="${ei}">+ Sem</button>
+      </div>
+    </div>`;
+}
+
+function renderProgressionHtml(p, bi, ei, pi) {
+  const kg  = p.kg == null ? '' : String(p.kg);
+  const rep = p.reps == null ? '' : String(p.reps);
+  const ser = (!p.series || p.series === 0) ? '' : String(p.series);
+  return `
+    <div class="week">
+      <div class="week-label">Sem ${p.week}</div>
+      <div class="week-vals">
+        <input type="text" class="reps-input" data-bi="${bi}" data-ei="${ei}" data-pi="${pi}" value="${esc(rep)}" placeholder="-" />
+        <span class="week-x">×</span>
+        <div class="weight-input" data-bi="${bi}" data-ei="${ei}" data-pi="${pi}">
+          <button type="button" class="w-btn w-plus">+</button>
+          <input type="number" step="2.5" min="0" inputmode="decimal" class="w-val" value="${esc(kg)}" placeholder="-" />
+          <button type="button" class="w-btn w-minus">−</button>
+        </div>
+      </div>
+      <div class="series-row">
+        <span>series</span>
+        <input type="number" min="0" inputmode="numeric" class="series-input" data-bi="${bi}" data-ei="${ei}" data-pi="${pi}" value="${esc(ser)}" placeholder="-" />
+      </div>
+      <button class="prog-del-btn" data-action="del-week" data-bi="${bi}" data-ei="${ei}" data-pi="${pi}" title="Eliminar semana">✕</button>
+    </div>`;
+}
+
+function bindEditorEvents() {
+  const STEP = 2.5;
+
+  // Plan name / subtitle
+  document.getElementById('plan-name').addEventListener('change', (e) => {
+    state.currentData.name = e.target.value;
+    triggerSave();
+  });
+  document.getElementById('plan-subtitle').addEventListener('change', (e) => {
+    state.currentData.subtitle = e.target.value;
+    triggerSave();
+  });
+
+  // Add block
+  document.getElementById('add-block-btn').addEventListener('click', () => {
+    const num = (state.currentData.blocks || []).length + 1;
+    if (!state.currentData.blocks) state.currentData.blocks = [];
+    state.currentData.blocks.push({ block_number: num, name: `Bloque ${num}`, series: 3, exercises: [] });
+    triggerSave();
+    renderEditor();
+  });
+
+  // Block name
+  document.querySelectorAll('.block-name-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      state.currentData.blocks[+el.dataset.bi].name = el.value;
+      triggerSave();
+    });
+  });
+
+  // Block series
+  document.querySelectorAll('.block-series-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      state.currentData.blocks[+el.dataset.bi].series = Math.max(0, parseInt(el.value) || 0);
+      triggerSave();
+    });
+  });
+
+  // Exercise name
+  document.querySelectorAll('.ex-name-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      state.currentData.blocks[+el.dataset.bi].exercises[+el.dataset.ei].name = el.value;
+      triggerSave();
+    });
+  });
+
+  // Notes
+  document.querySelectorAll('.notes-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      state.currentData.blocks[+el.dataset.bi].exercises[+el.dataset.ei].notes = el.value;
+      triggerSave();
+    });
+  });
+
+  // Reps
+  document.querySelectorAll('.reps-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      state.currentData.blocks[+el.dataset.bi].exercises[+el.dataset.ei].progressions[+el.dataset.pi].reps = el.value;
+      triggerSave();
+    });
+  });
+
+  // KG steppers
+  document.querySelectorAll('.weight-input').forEach((wrap) => {
+    const bi = +wrap.dataset.bi, ei = +wrap.dataset.ei, pi = +wrap.dataset.pi;
+    const input = wrap.querySelector('.w-val');
+    const commit = (raw) => {
+      const n = Number(raw);
+      const next = !isFinite(n) || n <= 0 ? '' : String(Math.round(n * 100) / 100);
+      input.value = next;
+      state.currentData.blocks[bi].exercises[ei].progressions[pi].kg = next || null;
+      triggerSave();
+    };
+    wrap.querySelector('.w-plus').addEventListener('click', () => commit((Number(input.value) || 0) + STEP));
+    wrap.querySelector('.w-minus').addEventListener('click', () => commit((Number(input.value) || 0) - STEP));
+    input.addEventListener('change', () => commit(input.value));
+  });
+
+  // Series per progression
+  document.querySelectorAll('.series-input').forEach((el) => {
+    el.addEventListener('change', () => {
+      const n = Math.max(0, parseInt(el.value) || 0);
+      el.value = n === 0 ? '' : String(n);
+      state.currentData.blocks[+el.dataset.bi].exercises[+el.dataset.ei].progressions[+el.dataset.pi].series = n;
+      triggerSave();
+    });
+  });
+
+  // Structural actions
+  document.querySelectorAll('[data-action]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const action = el.dataset.action;
+      const bi = el.dataset.bi != null ? +el.dataset.bi : null;
+      const ei = el.dataset.ei != null ? +el.dataset.ei : null;
+      const pi = el.dataset.pi != null ? +el.dataset.pi : null;
+
+      if (action === 'del-block') {
+        if (!confirm('¿Eliminar este bloque? No se puede deshacer.')) return;
+        state.currentData.blocks.splice(bi, 1);
+        state.currentData.blocks.forEach((b, i) => { b.block_number = i + 1; });
+        triggerSave();
+        renderEditor();
+
+      } else if (action === 'add-ex') {
+        const exs = state.currentData.blocks[bi].exercises;
+        const defaultSeries = state.currentData.blocks[bi].series || 3;
+        const maxWeek = exs.length > 0
+          ? Math.max(...exs.flatMap(e => e.progressions.map(p => p.week)), 1)
+          : 1;
+        const progs = Array.from({ length: maxWeek }, (_, i) => ({ week: i + 1, kg: null, reps: '', series: defaultSeries }));
+        exs.push({ position: exs.length + 1, name: '', notes: '', progressions: progs });
+        triggerSave();
+        renderEditor();
+
+      } else if (action === 'del-ex') {
+        if (!confirm('¿Eliminar este ejercicio?')) return;
+        state.currentData.blocks[bi].exercises.splice(ei, 1);
+        state.currentData.blocks[bi].exercises.forEach((ex, i) => { ex.position = i + 1; });
+        triggerSave();
+        renderEditor();
+
+      } else if (action === 'move-up' && ei > 0) {
+        const exs = state.currentData.blocks[bi].exercises;
+        [exs[ei - 1], exs[ei]] = [exs[ei], exs[ei - 1]];
+        exs.forEach((ex, i) => { ex.position = i + 1; });
+        triggerSave();
+        renderEditor();
+
+      } else if (action === 'move-down') {
+        const exs = state.currentData.blocks[bi].exercises;
+        if (ei < exs.length - 1) {
+          [exs[ei], exs[ei + 1]] = [exs[ei + 1], exs[ei]];
+          exs.forEach((ex, i) => { ex.position = i + 1; });
+          triggerSave();
+          renderEditor();
+        }
+
+      } else if (action === 'add-week') {
+        const progs = state.currentData.blocks[bi].exercises[ei].progressions;
+        const maxWeek = progs.reduce((m, p) => Math.max(m, p.week), 0);
+        const defaultSeries = state.currentData.blocks[bi].series || 3;
+        progs.push({ week: maxWeek + 1, kg: null, reps: '', series: defaultSeries });
+        triggerSave();
+        renderEditor();
+
+      } else if (action === 'del-week') {
+        state.currentData.blocks[bi].exercises[ei].progressions.splice(pi, 1);
+        triggerSave();
+        renderEditor();
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════
+async function boot() {
+  const saved = sessionStorage.getItem('coach');
+  if (saved) {
+    try {
+      state.coach = JSON.parse(saved);
+      root.innerHTML = `<div class="center"><div class="spin"></div></div>`;
+      updateTopbar();
+      await loadMembers();
+      navigate('dashboard');
+      return;
+    } catch { sessionStorage.removeItem('coach'); }
+  }
+  navigate('login');
+}
+
+updateTopbar();
+boot();
+</script>
+
+</body>
+</html>
